@@ -57,6 +57,7 @@ while task != "stop":
 
 # Here are all the imports needed for the web-app dashboard.
 import pandas as pd
+import numpy as np
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
@@ -80,34 +81,55 @@ app.config.suppress_callback_exceptions = True
 # In[ ]:
 
 
-# Making guesses empty pandas series
-all_guesses = pd.Series(dtype='float', name='guesses')
-
+# Making guesses empty numpy array
+all_guesses = np.empty(2)
 
 # In[ ]:
 
 
-app.layout = html.Div(
-    children=[dcc.Store(id='guess', storage_type='local'),
-        html.H1('Gumball Guess',  style={'textAlign': 'center', 'color':'#C33C54','font-size':36}),
-        html.Div([html.Div(
-            [html.Div([
-                html.H2('Enter your guess here: ',
-                style={'margin-right': '2em'})]),
-                html.Div([dcc.Input(id='input-guess',value=None,type='number',style={'height':'50px','font-size':35})],
-                style={}),]),
-                html.Div([], id='hist-plot')])])
+app.layout = html.Div([dcc.Store(id='guess', storage_type='local'),
+    html.H1('Gumball Guess',  style={'textAlign': 'center', 'color':'#C33C54','font-size':36}),
+    html.Div(
+        html.H2('Enter your guess here: ',
+        style={'margin-right': '2em'})),
+    html.Div(dcc.Input(id='input-guess',value=None,type='number',style={'height':'50px','font-size':35})),
+    html.Button('Submit', id='submit-val', n_clicks=0),
+    html.Div([], id='hist-plot')])
 
-@app.callback(Output('hist-plot', 'children'),
-              Input('input-guess', 'value'),
-              State('guess', 'data'))
-def graph_guesses(guess, data):
-    if guess is None:
+
+'''
+app.layout = html.Div([
+    html.Div(dcc.Input(id='input-on-submit', type='text')),
+    html.Button('Submit', id='submit-val', n_clicks=0),
+    html.Div(id='container-button-basic',
+             children='Enter a value and press submit')
+])
+
+@app.callback(
+    dash.dependencies.Output('container-button-basic', 'children'),
+    [dash.dependencies.Input('submit-val', 'n_clicks')],
+    [dash.dependencies.State('input-on-submit', 'value')])
+def update_output(n_clicks, value):
+    return 'The input value was "{}" and the button has been clicked {} times'.format(
+        value,
+        n_clicks
+    )
+
+
+'''
+
+@app.callback(
+    dash.dependencies.Output('hist-plot', 'children'),
+    [dash.dependencies.Input('submit-val', 'n_clicks')],
+    [dash.dependencies.State('input-guess', 'value')])
+def graph_guesses(n_clicks, value):
+    if value is None:
         # prevent the None callbacks is important with the store component.
         # you don't want to update the store for nothing.
         raise PreventUpdate
-    all_guesses.append(data)
-    dist_fig = px.histogram(all_guesses, x = 'guesses')
+    np.append(all_guesses, value)
+    guess_df = pd.DataFrame({'guesses':all_guesses})
+    dist_fig = px.histogram(guess_df, x = 'guesses', nbins=20)
     return dcc.Graph(figure=dist_fig)
 
 
@@ -119,8 +141,9 @@ if __name__ == '__main__':
     app.run_server(debug=True)
 
 
-# In[ ]:
-
+# Next steps:
+# Add button to submit number guess.
+# Add histogram to visualize guesses.
 
 
 
