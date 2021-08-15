@@ -1,9 +1,10 @@
 import numpy as np
+import pandas as pd
 
 
-all_guesses = np.empty(2)
-np.append(all_guesses, value)
-guess_df = pd.DataFrame({'guesses':all_guesses})
+guess_df = pd.DataFrame(columns = ['Guess value'])
+value = 34
+guess_df.loc[len(guess_df)] = value
 
-print(guess_df)
+print(guess_df.head())
 #dist_fig = px.histogram(all_guesses, x = 'guesses')

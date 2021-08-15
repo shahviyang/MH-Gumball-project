@@ -81,8 +81,8 @@ app.config.suppress_callback_exceptions = True
 # In[ ]:
 
 
-# Making guesses empty numpy array
-all_guesses = np.empty(2)
+
+guess_df = pd.DataFrame(columns = ['Guess value'])
 
 # In[ ]:
 
@@ -118,6 +118,8 @@ def update_output(n_clicks, value):
 
 '''
 
+
+
 @app.callback(
     dash.dependencies.Output('hist-plot', 'children'),
     [dash.dependencies.Input('submit-val', 'n_clicks')],
@@ -127,9 +129,8 @@ def graph_guesses(n_clicks, value):
         # prevent the None callbacks is important with the store component.
         # you don't want to update the store for nothing.
         raise PreventUpdate
-    np.append(all_guesses, value)
-    guess_df = pd.DataFrame({'guesses':all_guesses})
-    dist_fig = px.histogram(guess_df, x = 'guesses', nbins=20)
+    guess_df.loc[len(guess_df)] = value
+    dist_fig = px.histogram(guess_df, x = 'Guess value', nbins=10)
     return dcc.Graph(figure=dist_fig)
 
 
