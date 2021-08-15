@@ -1,16 +1,9 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
-# !pip install dash
-
-
-# In[ ]:
 
 
 '''
+
+Quan's code:
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -52,7 +45,6 @@ while task != "stop":
 '''
 
 
-# In[ ]:
 
 
 # Here are all the imports needed for the web-app dashboard.
@@ -69,7 +61,6 @@ import matplotlib.pyplot as plt
 #import yfinance as yf
 
 
-# In[ ]:
 
 
 app = dash.Dash(__name__)
@@ -78,13 +69,8 @@ app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
 
 
-# In[ ]:
 
-
-
-guess_df = pd.DataFrame(columns = ['Guess value'])
-
-# In[ ]:
+guess_df = pd.read_csv('guess_df.csv')
 
 
 app.layout = html.Div([dcc.Store(id='guess', storage_type='local'),
@@ -95,28 +81,6 @@ app.layout = html.Div([dcc.Store(id='guess', storage_type='local'),
     html.Div(dcc.Input(id='input-guess',value=None,type='number',style={'height':'50px','font-size':35})),
     html.Button('Submit', id='submit-val', n_clicks=0),
     html.Div([], id='hist-plot')])
-
-
-'''
-app.layout = html.Div([
-    html.Div(dcc.Input(id='input-on-submit', type='text')),
-    html.Button('Submit', id='submit-val', n_clicks=0),
-    html.Div(id='container-button-basic',
-             children='Enter a value and press submit')
-])
-
-@app.callback(
-    dash.dependencies.Output('container-button-basic', 'children'),
-    [dash.dependencies.Input('submit-val', 'n_clicks')],
-    [dash.dependencies.State('input-on-submit', 'value')])
-def update_output(n_clicks, value):
-    return 'The input value was "{}" and the button has been clicked {} times'.format(
-        value,
-        n_clicks
-    )
-
-
-'''
 
 
 
@@ -130,21 +94,15 @@ def graph_guesses(n_clicks, value):
         # you don't want to update the store for nothing.
         raise PreventUpdate
     guess_df.loc[len(guess_df)] = value
+    guess_df.to_csv('guess_df.csv')
     dist_fig = px.histogram(guess_df, x = 'Guess value', nbins=10)
     return dcc.Graph(figure=dist_fig)
 
-
-# In[ ]:
 
 
 # Run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
-
-
-# Next steps:
-# Add button to submit number guess.
-# Add histogram to visualize guesses.
 
 
 
