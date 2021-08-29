@@ -5,6 +5,7 @@ What we have come up with so far:
 - Button with storage features to store guess values to a data-frame
 - Histogram display of results
 
-What we till have to work on:
-- Better decorating the html and css parts (maybe include a MH logo)
+Currently working on:
 - Button to hide/show results histogram, so that people can guess without bias
+- Better decorating the html and css parts (maybe include a MH logo)
+- Working on histogram statistics
