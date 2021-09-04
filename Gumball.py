@@ -95,7 +95,8 @@ def graph_guesses(n_clicks, value):
         raise PreventUpdate
     guess_df.loc[len(guess_df)] = value
     guess_df.to_csv('guess_df.csv')
-    dist_fig = px.histogram(guess_df, x = 'Guess value', nbins=10)
+    dist_fig = px.histogram(guess_df, x = 'Guess value', nbins=10, marginal='box')
+    dist_fig.update_traces(marker_color='#19D3F3')
     return dcc.Graph(figure=dist_fig)
 
 
