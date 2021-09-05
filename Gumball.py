@@ -80,22 +80,41 @@ app.layout = html.Div([dcc.Store(id='guess', storage_type='local'),
         style={'margin-right': '2em'})),
     html.Div(dcc.Input(id='input-guess',value=None,type='number',style={'height':'50px','font-size':35})),
     html.Button('Submit', id='submit-val', n_clicks=0),
+    #html.Button('Show/hide results', id='show-res', n_clicks=0),
     html.Div([], id='hist-plot')])
 
+'''
+Adding hide/show button steps:
+
+1. html.Button('Show/hide results')
+2. if statements in callback function
+
+
+'''
+
+#dash.dependencies.Input('show-res', 'n_clicks')
+
+'''
+if n_clicks1 > 0:
+        n_clicks1 = 0
+        ret_disp = 'Your guess value is updated.'
+    else:
+        ret_disp = dcc.Graph(figure=dist_fig)
+'''
 
 
 @app.callback(
     dash.dependencies.Output('hist-plot', 'children'),
     [dash.dependencies.Input('submit-val', 'n_clicks')],
     [dash.dependencies.State('input-guess', 'value')])
-def graph_guesses(n_clicks, value):
+def graph_guesses(btn1, value):
     if value is None:
         # prevent the None callbacks is important with the store component.
         # you don't want to update the store for nothing.
         raise PreventUpdate
     guess_df.loc[len(guess_df)] = value
     guess_df.to_csv('guess_df.csv')
-    dist_fig = px.histogram(guess_df, x = 'Guess value', nbins=10)
+    dist_fig = px.histogram(guess_df, x = 'Guess value')
     return dcc.Graph(figure=dist_fig)
 
 
