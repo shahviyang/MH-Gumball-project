@@ -33,7 +33,7 @@ while task != "stop":
 
         #Apply function to the data.
         pdf = normal_dist(all_guesses,mean,sd)
- 
+
         #Plotting the Results
         plt.plot(all_guesses,pdf , color = 'red')
         plt.xlabel('Data points')
@@ -114,7 +114,8 @@ def graph_guesses(btn1, value):
         raise PreventUpdate
     guess_df.loc[len(guess_df)] = value
     guess_df.to_csv('guess_df.csv')
-    dist_fig = px.histogram(guess_df, x = 'Guess value')
+    dist_fig = px.histogram(guess_df, x = 'Guess value', nbins=10, marginal='box')
+    dist_fig.update_traces(marker_color='#19D3F3')
     return dcc.Graph(figure=dist_fig)
 
 
@@ -122,6 +123,3 @@ def graph_guesses(btn1, value):
 # Run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
-
-
-
