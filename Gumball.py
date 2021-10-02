@@ -51,6 +51,7 @@ while task != "stop":
 import pandas as pd
 import numpy as np
 import dash
+import dash_table
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
@@ -118,12 +119,12 @@ def graph_guesses(btn1, btn2, btn3, value):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     if 'submit-val' in changed_id:
         guess_df.loc[len(guess_df)] = value
-        guess_df.to_csv('guess_df.csv')
+        guess_df.to_csv('guess_df.csv',index=False)
         showpg = html.H3('Your guess has been recorded!')
     elif 'show-res' in changed_id:
         dist_fig = px.histogram(guess_df, x = 'Guess value', nbins=10, marginal='box')
         dist_fig.update_traces(marker_color='#19D3F3')
-        showpg = dcc.Graph(figure=dist_fig)
+        showpg = html.Div([dcc.Graph(figure=dist_fig),dash_table.DataTable(id='table',columns=[{"name": i, "id": i} for i in guess_df.describe().columns],data=guess_df.describe().to_dict('records'))])
     elif 'hide-res' in changed_id:
         showpg = html.H3('Please enter the next guess.')
     return showpg
