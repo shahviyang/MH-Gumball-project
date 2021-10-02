@@ -58,6 +58,8 @@ from dash.exceptions import PreventUpdate
 #from jupyter_dash import JupyterDash
 import plotly.express as px
 import matplotlib.pyplot as plt
+
+import time
 #import yfinance as yf
 
 
@@ -80,7 +82,8 @@ app.layout = html.Div([dcc.Store(id='guess', storage_type='local'),
         style={'margin-right': '2em'})),
     html.Div(dcc.Input(id='input-guess',value=None,type='number',style={'height':'50px','font-size':35})),
     html.Button('Submit', id='submit-val', n_clicks=0),
-    #html.Button('Show/hide results', id='show-res', n_clicks=0),
+    html.Button('Show resutls', id='show-res', n_clicks=0),
+    html.Button('Hide resutls', id='hide-res', n_clicks=0),
     html.Div([], id='hist-plot')])
 
 '''
@@ -105,18 +108,31 @@ if n_clicks1 > 0:
 
 @app.callback(
     dash.dependencies.Output('hist-plot', 'children'),
-    [dash.dependencies.Input('submit-val', 'n_clicks')],
+    [dash.dependencies.Input('submit-val', 'n_clicks'),
+    dash.dependencies.Input('show-res', 'n_clicks'),
+    dash.dependencies.Input('hide-res', 'n_clicks')],
     [dash.dependencies.State('input-guess', 'value')])
-def graph_guesses(btn1, value):
+def graph_guesses(btn1, btn2, btn3, value):
     if value is None:
-        # prevent the None callbacks is important with the store component.
-        # you don't want to update the store for nothing.
         raise PreventUpdate
-    guess_df.loc[len(guess_df)] = value
-    guess_df.to_csv('guess_df.csv')
-    dist_fig = px.histogram(guess_df, x = 'Guess value', nbins=10, marginal='box')
-    dist_fig.update_traces(marker_color='#19D3F3')
-    return dcc.Graph(figure=dist_fig)
+    changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    if 'submit-val' in changed_id:
+        guess_df.loc[len(guess_df)] = value
+        guess_df.to_csv('guess_df.csv')
+        showpg = html.H3('Your guess has been recorded!')
+    elif 'show-res' in changed_id:
+        dist_fig = px.histogram(guess_df, x = 'Guess value', nbins=10, marginal='box')
+        dist_fig.update_traces(marker_color='#19D3F3')
+        showpg = dcc.Graph(figure=dist_fig)
+    elif 'hide-res' in changed_id:
+        showpg = html.H3('Please enter the next guess.')
+    return showpg
+
+'''
+Time sleep for auto-hide plot results (60 seconds).
+Hide button as well to hide plot results.
+Add timestamp to each guess value data, so we can plot weekly guesses and all time guesses too.
+'''
 
 
 
